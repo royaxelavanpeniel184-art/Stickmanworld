@@ -24,12 +24,19 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Find Android project
+        run: |
+          echo "Searching for settings.gradle..."
+          find . -name "settings.gradle" -o -name "settings.gradle.kts"
+
       - name: Build APK
-        working-directory: StickmanWorld
-        run: gradle assembleDebug --no-daemon
+        run: |
+          PROJECT_DIR=$(dirname "$(find . -name settings.gradle -print -quit)")
+          echo "Android project found at: $PROJECT_DIR"
+          gradle -p "$PROJECT_DIR" assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: StickmanWorld-debug-apk
-          path: StickmanWorld/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app/build/outputs/apk/debug/app-debug.apk"
